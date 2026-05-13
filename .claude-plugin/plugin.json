@@ -1,0 +1,21 @@
+{
+  "name": "ripple",
+  "description": "A guided breathing session with WebGPU water and singing-bowl chimes. /breathe opens a chromeless Chrome window that walks you through 4-7-8, box, coherent, or physiological-sigh breathing — then closes itself.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Joey Villarreal",
+    "url": "https://github.com/jayvee6"
+  },
+  "homepage": "https://jayvee6.github.io/ripple/",
+  "repository": "https://github.com/jayvee6/ripple",
+  "license": "MIT",
+  "keywords": [
+    "breathing",
+    "meditation",
+    "mindfulness",
+    "wellness",
+    "focus",
+    "4-7-8",
+    "box-breathing"
+  ]
+}

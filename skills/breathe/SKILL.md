@@ -1,3 +1,9 @@
+---
+name: breathe
+description: Open a guided breathing session in a chromeless Chrome app window. Use when the user explicitly types /breathe, or asks to run a breathing exercise. Supports four exercises (4-7-8, box, coherent, physiological sigh) and remembers user preferences across sessions.
+disable-model-invocation: true
+---
+
 Open a breathing session in a chromeless Chrome app window. Multiple exercises supported. Picks one based on user preferences when not specified.
 
 **Arguments:** `$ARGUMENTS` — free-form. Each token is either an exercise name or a cycle count (integer 1–10). Order doesn't matter.
@@ -26,7 +32,7 @@ If multiple exercise names are given, use the last one. If multiple integers, us
 
 If the user didn't specify an exercise, check memory for a file like `user_breathing_preferences.md`. Two cases:
 
-**No preferences yet:** Pick `478` (the user's established practice) as default, and after launching, note in chat: "Picked 4-7-8 today. After this session, tell me how it felt and I'll start learning what works for you." Don't update memory yet.
+**No preferences yet:** Pick `478` as a default, and after launching, note in chat: "Picked 4-7-8 today. After this session, tell me how it felt and I'll start learning what works for you." Don't update memory yet.
 
 **Preferences exist:** Pick based on what the user has responded well to, with some variety (don't repeat the last one chosen unless they explicitly liked it). Pick silently and just launch.
 
@@ -48,10 +54,10 @@ open "https://jayvee6.github.io/ripple/?exercise=KEY&cycles=N"
 
 One sentence. Include the exercise, cycle count, and rough duration. Examples:
 
-- `/breathe` (no prefs) → "Opening 4-cycle 4-7-8 — see you in about 76 seconds. Tell me afterwards how it felt."
-- `/breathe box 6` → "Opening 6-cycle box breathing — about 96 seconds."
-- `/breathe coherent` → "Opening 6-cycle coherent breathing (5.5/5.5) — about 66 seconds."
-- `/breathe sigh` → "Opening a physiological sigh reset — about 23 seconds."
+- `/ripple:breathe` (no prefs) → "Opening 4-cycle 4-7-8 — see you in about 76 seconds. Tell me afterwards how it felt."
+- `/ripple:breathe box 6` → "Opening 6-cycle box breathing — about 96 seconds."
+- `/ripple:breathe coherent` → "Opening 6-cycle coherent breathing (5.5/5.5) — about 66 seconds."
+- `/ripple:breathe sigh` → "Opening a physiological sigh reset — about 23 seconds."
 
 Duration formulas:
 - 478: 19 × cycles

@@ -1,0 +1,15 @@
+{
+  "name": "ripple",
+  "description": "Ripple — a /breathe slash command for Claude Code with WebGPU water and singing-bowl chimes.",
+  "version": "1.0.0",
+  "plugins": [
+    {
+      "name": "ripple",
+      "description": "Guided breathing sessions (4-7-8, box, coherent, physiological sigh). Opens a calming WebGPU water scene, runs a configurable session, then closes itself.",
+      "location": ".",
+      "version": "1.0.0",
+      "homepage": "https://jayvee6.github.io/ripple/",
+      "repository": "https://github.com/jayvee6/ripple"
+    }
+  ]
+}
