@@ -35,13 +35,13 @@ If the user didn't specify an exercise, check memory for a file like `user_breat
 Build the URL with the canonical exercise key and cycle count. Run:
 
 ```bash
-open -na "Google Chrome" --args --app="https://jayvee6.github.io/breathe/?exercise=KEY&cycles=N"
+open -na "Google Chrome" --args --app="https://jayvee6.github.io/ripple/?exercise=KEY&cycles=N"
 ```
 
 If Chrome isn't installed (the command fails), fall back to:
 
 ```bash
-open "https://jayvee6.github.io/breathe/?exercise=KEY&cycles=N"
+open "https://jayvee6.github.io/ripple/?exercise=KEY&cycles=N"
 ```
 
 ### 4. Reply in chat

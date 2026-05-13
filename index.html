@@ -188,6 +188,118 @@
       background: #000;
       opacity: 0; pointer-events: none;
     }
+
+    /* SELECTOR — shown when ?exercise= is not in the URL.
+       The selector ITSELF is one big frosted-glass plane covering the
+       viewport. The water + stone animate behind, blurred to a soft glow
+       that gives the glass character without distracting. Cards sit on
+       the plane as raised buttons. */
+    #selector {
+      position: fixed; inset: 0; z-index: 11;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 32px;
+      padding: 40px 20px;
+      background: rgba(10, 30, 60, 0.22);
+      backdrop-filter: blur(32px) saturate(1.5);
+      -webkit-backdrop-filter: blur(32px) saturate(1.5);
+      transition: opacity 0.8s ease;
+      overflow: hidden;
+    }
+    /* Soft overhead-light glow at the top of the glass — gives it surface */
+    #selector::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(180, 220, 240, 0.10), transparent 55%),
+        radial-gradient(ellipse at 50% 100%, rgba(10, 30, 60, 0.18), transparent 60%);
+      pointer-events: none;
+    }
+    /* Hairline edge highlight at the top — the meniscus of the glass plane */
+    #selector::after {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg,
+        transparent 0%, rgba(220, 240, 250, 0.15) 50%, transparent 100%);
+      pointer-events: none;
+    }
+    #selector h1 {
+      font-size: 34px; font-weight: 200;
+      letter-spacing: 0.06em;
+      color: rgba(234,240,250,0.95);
+      position: relative;
+    }
+    #selector .tagline {
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.34em; text-transform: uppercase;
+      color: rgba(234,240,250,0.45);
+      margin-bottom: 4px;
+      position: relative;
+    }
+    .exercise-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 240px));
+      gap: 14px;
+      width: 100%;
+      max-width: 500px;
+      position: relative;
+    }
+    .exercise-card {
+      /* No backdrop-filter — the parent provides the frosting.
+         These are raised buttons on the glass, not glass themselves. */
+      background: rgba(255, 255, 255, 0.045);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: 16px;
+      padding: 22px 22px;
+      color: rgba(234,240,250,0.92);
+      font-family: inherit;
+      cursor: pointer;
+      display: flex; flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+      text-align: left;
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.06) inset,
+        0 2px 8px rgba(0, 10, 30, 0.18);
+      transition: transform 0.3s ease, background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+      will-change: transform;
+    }
+    .exercise-card:hover {
+      background: rgba(120, 195, 215, 0.10);
+      border-color: rgba(120, 195, 215, 0.32);
+      transform: translateY(-3px);
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.10) inset,
+        0 6px 14px rgba(0, 10, 30, 0.30);
+    }
+    .exercise-card:active {
+      transform: translateY(0);
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.04) inset,
+        0 2px 6px rgba(0, 10, 30, 0.20);
+    }
+    .card-name {
+      font-size: 20px; font-weight: 300;
+      letter-spacing: 0.02em;
+      color: rgba(234,240,250,0.95);
+    }
+    .card-pattern {
+      font-size: 11px; font-weight: 500;
+      letter-spacing: 0.20em;
+      color: rgba(234,240,250,0.55);
+      font-variant-numeric: tabular-nums;
+      text-transform: uppercase;
+    }
+    .card-desc {
+      font-size: 10px; font-weight: 600;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: rgba(120, 195, 215, 0.72);
+      margin-top: 8px;
+    }
+    @media (max-width: 520px) {
+      .exercise-grid { grid-template-columns: 1fr; max-width: 280px; }
+      .exercise-card { padding: 18px 18px; }
+    }
   </style>
 </head>
 <body>
@@ -222,6 +334,33 @@
   </div>
 
   <div id="curtain"></div>
+
+  <div id="selector" style="display:none;" aria-hidden="true">
+    <h1>breathe</h1>
+    <div class="tagline">choose your breath</div>
+    <div class="exercise-grid">
+      <button class="exercise-card" data-key="478">
+        <div class="card-name">4-7-8</div>
+        <div class="card-pattern">4 · 7 · 8</div>
+        <div class="card-desc">Stress relief</div>
+      </button>
+      <button class="exercise-card" data-key="box">
+        <div class="card-name">Box</div>
+        <div class="card-pattern">4 · 4 · 4 · 4</div>
+        <div class="card-desc">Focus</div>
+      </button>
+      <button class="exercise-card" data-key="coherent">
+        <div class="card-name">Coherent</div>
+        <div class="card-pattern">5.5 · 5.5</div>
+        <div class="card-desc">HRV training</div>
+      </button>
+      <button class="exercise-card" data-key="sigh">
+        <div class="card-name">Sigh</div>
+        <div class="card-pattern">Double inhale</div>
+        <div class="card-desc">Quick reset</div>
+      </button>
+    </div>
+  </div>
 
   <script>
   // ─── Config ──────────────────────────────────────────────────────────
@@ -275,15 +414,25 @@
   };
 
   const params = new URLSearchParams(window.location.search);
-  const exerciseKey = EXERCISE_ALIASES[(params.get('exercise') || '478').toLowerCase()] || '478';
-  const EXERCISE = EXERCISES[exerciseKey];
 
-  let CYCLES = parseInt(params.get('cycles'), 10);
-  if (!Number.isFinite(CYCLES) || CYCLES < 1) CYCLES = EXERCISE.defaultCycles;
-  if (CYCLES > 10) CYCLES = 10;
+  // EXERCISE/CYCLES are mutable — set either at load (URL param) or later
+  // (selector click). configureExercise() recomputes derived values.
+  let EXERCISE, CYCLES, SESSION_SECONDS;
 
-  // Total session duration in seconds — sum of all phases × cycles.
-  const SESSION_SECONDS = EXERCISE.phases.reduce((a, p) => a + p.duration, 0) * CYCLES;
+  function configureExercise(key, requestedCycles) {
+    const canon = EXERCISE_ALIASES[String(key || '').toLowerCase()] || '478';
+    EXERCISE = EXERCISES[canon];
+    let n = parseInt(requestedCycles, 10);
+    if (!Number.isFinite(n) || n < 1) n = EXERCISE.defaultCycles;
+    if (n > 10) n = 10;
+    CYCLES = n;
+    SESSION_SECONDS = EXERCISE.phases.reduce((a, p) => a + p.duration, 0) * CYCLES;
+  }
+
+  const urlExercise = params.get('exercise');
+  const urlCycles   = params.get('cycles');
+  // Set initial config — selector path will re-configure on card click.
+  configureExercise(urlExercise || '478', urlCycles);
 
   const AFFIRMATIONS = [
     "You're doing great.",
@@ -861,23 +1010,53 @@
     }, 600);
   }
 
-  // Show the selected exercise name on the splash screen
-  document.getElementById('splashTitle').textContent = EXERCISE.name;
+  // ─── Entry path: selector (no exercise in URL) vs splash (has one) ────
+  const selector = document.getElementById('selector');
 
-  splash.addEventListener('click', () => {
+  function startSession() {
+    document.getElementById('splashTitle').textContent = EXERCISE.name;
     initAudio();
-    gsap.to(splash, { opacity: 0, duration: 0.7, onComplete: () => {
-      splash.style.display = 'none';
-    }});
     setTimeout(runSession, 700);
-  }, { once: true });
+  }
 
-  window.addEventListener('keydown', (e) => {
-    if ((e.code === 'Space' || e.code === 'Enter') && splash.style.display !== 'none') {
-      e.preventDefault();
-      splash.click();
-    }
-  });
+  if (urlExercise) {
+    // Came in via slash command or shared URL — use the URL's exercise,
+    // show the splash, wait for click to begin.
+    document.getElementById('splashTitle').textContent = EXERCISE.name;
+    splash.addEventListener('click', () => {
+      initAudio();
+      gsap.to(splash, { opacity: 0, duration: 0.7, onComplete: () => {
+        splash.style.display = 'none';
+      }});
+      setTimeout(runSession, 700);
+    }, { once: true });
+    window.addEventListener('keydown', (e) => {
+      if ((e.code === 'Space' || e.code === 'Enter') && splash.style.display !== 'none') {
+        e.preventDefault();
+        splash.click();
+      }
+    });
+  } else {
+    // Came in via the bare URL — hide splash, show the exercise picker.
+    // Clicking a card sets the exercise and starts the session directly
+    // (the click itself unlocks Web Audio).
+    splash.style.display = 'none';
+    selector.style.display = 'flex';
+    selector.setAttribute('aria-hidden', 'false');
+
+    selector.querySelectorAll('.exercise-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const key = card.getAttribute('data-key');
+        configureExercise(key, urlCycles);  // preserve ?cycles= if it was passed
+        initAudio();
+        gsap.to(selector, { opacity: 0, duration: 0.8, onComplete: () => {
+          selector.style.display = 'none';
+          selector.setAttribute('aria-hidden', 'true');
+        }});
+        setTimeout(runSession, 900);
+      }, { once: true });
+    });
+  }
   </script>
 </body>
 </html>

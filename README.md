@@ -1,19 +1,19 @@
-# breathe
+# ripple
 
-A `/breathe` slash command for [Claude Code](https://claude.com/claude-code) that opens a calming WebGPU-rendered water scene and walks you through a 4-7-8 breathing session — singing-bowl chimes, real wave physics, then a quiet affirmation and the window closes itself.
+A `/breathe` slash command for [Claude Code](https://claude.com/claude-code) that opens a calming WebGPU-rendered water scene and walks you through a breathing session — singing-bowl chimes, real wave physics, then a quiet affirmation and the window closes itself.
 
-[**Try it live →**](https://jayvee6.github.io/breathe/)
+[**Try it live →**](https://jayvee6.github.io/ripple/)
 
 ## What it does
 
-You type `/breathe` in Claude Code. A chromeless Chrome window pops open with a still pool of water and a stone resting at its center. You click to begin. A Tibetan-bowl tone strikes, ripples radiate out across the water, and the breath cycle begins — 4 seconds in, 7 seconds held, 8 seconds out — for as many cycles as you asked for. At the end, the scene quiets, a single line lands ("Welcome back to now."), the room dims, and the window closes itself.
+You type `/breathe` in Claude Code. A chromeless Chrome window pops open with a still pool of water and a stone resting at its center. You click to begin. A Tibetan-bowl tone strikes, ripples radiate out across the water, and the breath cycle begins — for as many cycles as you asked for. At the end, the scene quiets, a single line lands ("Welcome back to now."), the room dims, and the window closes itself.
 
 Real wave physics. Real bowl harmonics. No interruption to your terminal flow.
 
 ## Install
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/jayvee6/breathe/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/jayvee6/ripple/main/install.sh | bash
 ```
 
 This drops a single file (`breathe.md`) into `~/.claude/commands/`. No clone, no dependencies, nothing else.
@@ -47,6 +47,8 @@ Cycle range is 1–10.
 
 When you call `/breathe` with no exercise specified, Claude picks one — defaulting to 4-7-8 the first time, then learning from your reactions over time. After a session, just tell Claude how it felt ("that was great," "felt too long," "loved the box one") and the preference gets saved.
 
+You can also visit [ripple's web app](https://jayvee6.github.io/ripple/) directly — the bare URL shows a glass-pane exercise picker.
+
 ## How it works
 
 Three layers, all in one self-contained HTML file:
@@ -56,6 +58,10 @@ Three layers, all in one self-contained HTML file:
 **Singing bowls** — Web Audio API, four sine partials per strike at inharmonic ratios (1.0 / 2.76 / 5.40 / 8.93) that approximate a Tibetan bowl spectrum. Each partial gets its own gain envelope: the fundamental sustains over 6–7 seconds, while higher overtones decay progressively faster (0.55× / 0.28× / 0.16× of the base decay) — that's the authentic "shimmer fades, hum sustains" quality. Slight detuning across partials produces natural beating.
 
 **The breath** — GSAP timelines drive the stone scale, halo opacity, phase label, and countdown. Each strike triggers bowl + ripple + a tiny "press" of the stone into the water. The HUD is a glass-blur aesthetic that stays out of the way.
+
+## Why "ripple"?
+
+The whole visual is a stone striking a pool of water and the rings radiating outward — a literal ripple. (And Apple has a `Breathe` watch app, so we kept the verb but renamed the project.)
 
 ## Roadmap
 
