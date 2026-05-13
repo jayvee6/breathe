@@ -184,7 +184,9 @@
     }
 
     #curtain {
-      position: fixed; inset: 0; z-index: 9;
+      /* Sits above the selector so it can fade-over and reveal-back the
+         picker between sessions without a visible reset snap. */
+      position: fixed; inset: 0; z-index: 12;
       background: #000;
       opacity: 0; pointer-events: none;
     }
@@ -481,6 +483,12 @@
   // ─── Singing Bowl Audio ──────────────────────────────────────────────
   let audioCtx = null, masterGain = null;
   function initAudio() {
+    if (audioCtx) {
+      // Returning from a previous session via the picker can leave the
+      // context suspended; just unsuspend in that case.
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return;
+    }
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     masterGain = audioCtx.createGain();
     masterGain.gain.value = 0.22;
@@ -1000,14 +1008,45 @@
     gsap.to(outro, { opacity: 1, duration: 1.0 });
 
     await new Promise(r => setTimeout(r, 4200));
-    gsap.to(curtain, { opacity: 1, duration: 1.6, ease: 'power2.in' });
-    await new Promise(r => setTimeout(r, 1700));
 
-    window.close();
-    setTimeout(() => {
-      gsap.to(curtain, { opacity: 0.65, duration: 0.8 });
-      gsap.to(outroHint, { opacity: 1, duration: 0.8, delay: 0.2 });
-    }, 600);
+    if (urlExercise) {
+      // Deep-link path (slash command / shared link) — fade to black and close.
+      gsap.to(curtain, { opacity: 1, duration: 1.6, ease: 'power2.in' });
+      await new Promise(r => setTimeout(r, 1700));
+      window.close();
+      setTimeout(() => {
+        gsap.to(curtain, { opacity: 0.65, duration: 0.8 });
+        gsap.to(outroHint, { opacity: 1, duration: 0.8, delay: 0.2 });
+      }, 600);
+    } else {
+      // Picker path — fade to black like the close path, but instead of
+      // closing, reset everything UNDER the black (no visible snap) and
+      // slowly retract the curtain to reveal the selector.
+      gsap.to(curtain, { opacity: 1, duration: 1.6, ease: 'power2.in' });
+      await new Promise(r => setTimeout(r, 1700));
+      // Held black — silent reset
+      resetSessionState();
+      selector.style.opacity = '1';
+      selector.style.display = 'flex';
+      selector.setAttribute('aria-hidden', 'false');
+      bindSelectorCards();  // re-attach (previous listeners were once:true)
+      await new Promise(r => setTimeout(r, 800));
+      // Slowly reveal the picker by retracting the curtain
+      gsap.to(curtain, { opacity: 0, duration: 5.0, ease: 'power2.inOut' });
+    }
+  }
+
+  // Restore all visible elements to their pre-session state so the picker
+  // looks fresh when it fades back in.
+  function resetSessionState() {
+    gsap.set('.stone-wrap', { opacity: 1, scale: 1.0, y: 0 });
+    gsap.set([phaseEl, countEl, cycleEl], { opacity: 0 });
+    phaseEl.textContent = '';
+    countEl.textContent = '';
+    cycleEl.textContent = '';
+    gsap.set(halo, { opacity: 0 });
+    gsap.set(outro, { opacity: 0 });
+    outroMsg.textContent = '';
   }
 
   // ─── Entry path: selector (no exercise in URL) vs splash (has one) ────
@@ -1039,11 +1078,15 @@
   } else {
     // Came in via the bare URL — hide splash, show the exercise picker.
     // Clicking a card sets the exercise and starts the session directly
-    // (the click itself unlocks Web Audio).
+    // (the click itself unlocks Web Audio). After a session ends, the
+    // picker fades back in for a follow-up.
     splash.style.display = 'none';
     selector.style.display = 'flex';
     selector.setAttribute('aria-hidden', 'false');
+    bindSelectorCards();
+  }
 
+  function bindSelectorCards() {
     selector.querySelectorAll('.exercise-card').forEach(card => {
       card.addEventListener('click', () => {
         const key = card.getAttribute('data-key');
