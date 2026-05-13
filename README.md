@@ -22,13 +22,30 @@ Restart Claude Code (or just start a new session) so the slash command registers
 
 ## Use
 
+The slash command accepts an exercise name and/or a cycle count, in any order:
+
 ```
-/breathe        → 4 cycles (~76 seconds, Dr. Weil's standard prescription)
-/breathe 1      → quick reset (~19s)
-/breathe 7      → longer session (~133s)
+/breathe                  → 4-7-8, 4 cycles (~76s)
+/breathe 1                → 4-7-8, 1 cycle (~19s)
+/breathe box              → box breathing, 4 cycles (~64s)
+/breathe coherent         → coherent breathing, 6 cycles (~66s)
+/breathe sigh             → physiological sigh, 3 cycles (~23s)
+/breathe box 6            → box breathing, 6 cycles
+/breathe coherent 10      → coherent, 10 cycles
 ```
 
-Range is 1–10.
+Cycle range is 1–10.
+
+### The exercises
+
+| Exercise | Pattern | Best for |
+|---|---|---|
+| **4-7-8** | 4 in / 7 hold / 8 out | Stress relief, falling asleep (Dr. Weil's standard prescription) |
+| **Box** | 4 in / 4 hold / 4 out / 4 rest | Focus, concentration, pre-performance |
+| **Coherent** | 5.5 in / 5.5 out | Sustained calm, HRV training |
+| **Physiological Sigh** | Double inhale + long exhale | Quick reset between tasks |
+
+When you call `/breathe` with no exercise specified, Claude picks one — defaulting to 4-7-8 the first time, then learning from your reactions over time. After a session, just tell Claude how it felt ("that was great," "felt too long," "loved the box one") and the preference gets saved.
 
 ## How it works
 
@@ -42,9 +59,9 @@ Three layers, all in one self-contained HTML file:
 
 ## Roadmap
 
-**v4 — more exercises, learned preferences.** Box breathing (4/4/4/4), coherent breathing (5.5/5.5), physiological sigh (double-inhale + long exhale). Claude tracks which ones work for you over time and picks accordingly when you call `/breathe` without an exercise specified. The slash command becomes a conversational coach rather than a one-shot launcher.
-
 **v5 — ambient mode.** A way to run a continuous low-intensity water scene as a focus background while you work, without the structured breath cycle.
+
+**v6 — per-exercise audio variations.** Right now all four exercises share the same three bowl pitches (inhale / hold / exhale). Each exercise could get its own pitch set so they feel acoustically distinct — e.g. box gets lower / more grounded, coherent gets warmer and more sustained.
 
 ## Uninstall
 

@@ -212,7 +212,7 @@
 
   <div id="splash">
     <div class="pulse"></div>
-    <h1>4-7-8</h1>
+    <h1 id="splashTitle">4-7-8</h1>
     <p>Click anywhere to begin</p>
   </div>
 
@@ -225,12 +225,65 @@
 
   <script>
   // ─── Config ──────────────────────────────────────────────────────────
-  const params  = new URLSearchParams(window.location.search);
-  let CYCLES    = parseInt(params.get('cycles'), 10);
-  if (!Number.isFinite(CYCLES) || CYCLES < 1) CYCLES = 4;
+  // Each exercise is a sequence of phases run per cycle. The phase runner
+  // dispatches behavior based on `type`; all four exercises share the same
+  // water/stone/bowl machinery, just with different rhythms.
+  const EXERCISES = {
+    '478': {
+      name: '4-7-8',
+      defaultCycles: 4,
+      phases: [
+        { type: 'inhale',    duration: 4, label: 'Breathe in' },
+        { type: 'hold-full', duration: 7, label: 'Hold' },
+        { type: 'exhale',    duration: 8, label: 'Breathe out' },
+      ],
+    },
+    'box': {
+      name: 'Box',
+      defaultCycles: 4,
+      phases: [
+        { type: 'inhale',     duration: 4, label: 'Breathe in' },
+        { type: 'hold-full',  duration: 4, label: 'Hold' },
+        { type: 'exhale',     duration: 4, label: 'Breathe out' },
+        { type: 'hold-empty', duration: 4, label: 'Rest' },
+      ],
+    },
+    'coherent': {
+      name: 'Coherent',
+      defaultCycles: 6,
+      phases: [
+        { type: 'inhale', duration: 5.5, label: 'Breathe in' },
+        { type: 'exhale', duration: 5.5, label: 'Breathe out' },
+      ],
+    },
+    'sigh': {
+      name: 'Physiological Sigh',
+      defaultCycles: 3,
+      phases: [
+        { type: 'inhale',     duration: 1.5, label: 'Breathe in' },
+        { type: 'inhale-top', duration: 1.0, label: 'A little more' },
+        { type: 'exhale',     duration: 5.0, label: 'Long exhale' },
+      ],
+    },
+  };
+  // Aliases — friendly names map to the canonical keys above.
+  const EXERCISE_ALIASES = {
+    '478': '478', '4-7-8': '478', '47 8': '478', 'four-seven-eight': '478',
+    'box': 'box', 'square': 'box', 'tactical': 'box',
+    'coherent': 'coherent', 'resonance': 'coherent', '5.5': 'coherent', 'hrv': 'coherent',
+    'sigh': 'sigh', 'physiological': 'sigh', 'physsigh': 'sigh', 'reset': 'sigh',
+  };
+
+  const params = new URLSearchParams(window.location.search);
+  const exerciseKey = EXERCISE_ALIASES[(params.get('exercise') || '478').toLowerCase()] || '478';
+  const EXERCISE = EXERCISES[exerciseKey];
+
+  let CYCLES = parseInt(params.get('cycles'), 10);
+  if (!Number.isFinite(CYCLES) || CYCLES < 1) CYCLES = EXERCISE.defaultCycles;
   if (CYCLES > 10) CYCLES = 10;
 
-  const INHALE = 4, HOLD = 7, EXHALE = 8;
+  // Total session duration in seconds — sum of all phases × cycles.
+  const SESSION_SECONDS = EXERCISE.phases.reduce((a, p) => a + p.duration, 0) * CYCLES;
 
   const AFFIRMATIONS = [
     "You're doing great.",
@@ -712,49 +765,72 @@
     return id;
   }
 
-  function inhale() {
+  // ─── Phase runner ────────────────────────────────────────────────────
+  // Each phase type has its own behavior — what the stone does, what bowl
+  // strikes (if any), what the halo does. The runner dispatches on
+  // phase.type and awaits the duration. Cleaner than 4 separate exercises
+  // duplicating animation logic.
+
+  // Scale anchors — stone size at "empty" and "full"
+  const SCALE_EMPTY = 1.00;
+  const SCALE_FULL  = 1.04;
+  const SCALE_OVERFULL = 1.055;  // for inhale-top (physiological sigh)
+
+  function runPhase(phase) {
     return new Promise(resolve => {
-      setPhaseText('Breathe in');
-      strike(bowlInhale, 1.4);
-      const id = runCountdown(INHALE);
-      gsap.to('.stone-wrap', { scale: 1.04, duration: INHALE, ease: 'power2.inOut' });
-      gsap.to(halo, { opacity: 0.85, duration: INHALE, ease: 'power2.inOut' });
-      setTimeout(() => { clearInterval(id); resolve(); }, INHALE * 1000);
-    });
-  }
-  function hold() {
-    return new Promise(resolve => {
-      setPhaseText('Hold');
-      strike(bowlHold, 1.0);
-      const id = runCountdown(HOLD);
-      // Mid-hold soft pulse, no chime — water remembering
-      const midPulse = setTimeout(() => {
-        const cx = window.innerWidth  / 2;
-        const cy = window.innerHeight / 2;
-        triggerPulse(cx, cy, 0.5);
-      }, (HOLD / 2) * 1000);
-      const jitterTween = gsap.to('.stone-wrap', {
-        keyframes: [
-          { scale: 1.045, duration: 1.5, ease: 'sine.inOut' },
-          { scale: 1.030, duration: 1.7, ease: 'sine.inOut' },
-          { scale: 1.045, duration: 1.5, ease: 'sine.inOut' },
-          { scale: 1.040, duration: 1.4, ease: 'sine.inOut' },
-          { scale: 1.040, duration: 0.9, ease: 'sine.inOut' },
-        ],
-      });
-      setTimeout(() => {
-        clearInterval(id); jitterTween.kill(); clearTimeout(midPulse); resolve();
-      }, HOLD * 1000);
-    });
-  }
-  function exhale() {
-    return new Promise(resolve => {
-      setPhaseText('Breathe out');
-      strike(bowlExhale, 1.6);
-      const id = runCountdown(EXHALE);
-      gsap.to('.stone-wrap', { scale: 1.0, duration: EXHALE, ease: 'power2.inOut' });
-      gsap.to(halo, { opacity: 0.0, duration: EXHALE, ease: 'power2.inOut' });
-      setTimeout(() => { clearInterval(id); resolve(); }, EXHALE * 1000);
+      setPhaseText(phase.label);
+      const dur = phase.duration;
+      // Countdown rounds up — a 1.5s phase shows "2 → 1"
+      const id = runCountdown(Math.max(1, Math.round(dur)));
+
+      switch (phase.type) {
+        case 'inhale': {
+          strike(bowlInhale, 1.4);
+          gsap.to('.stone-wrap', { scale: SCALE_FULL, duration: dur, ease: 'power2.inOut' });
+          gsap.to(halo, { opacity: 0.85, duration: dur, ease: 'power2.inOut' });
+          break;
+        }
+        case 'inhale-top': {
+          // Quick top-off inhale for physiological sigh — smaller strike
+          strike(bowlInhale, 0.75);
+          gsap.to('.stone-wrap', { scale: SCALE_OVERFULL, duration: dur, ease: 'power2.out' });
+          gsap.to(halo, { opacity: 1.0, duration: dur, ease: 'power2.out' });
+          break;
+        }
+        case 'hold-full': {
+          strike(bowlHold, 1.0);
+          // Mid-hold soft pulse — water remembering
+          if (dur >= 3) {
+            setTimeout(() => triggerPulse(window.innerWidth/2, window.innerHeight/2, 0.5), (dur / 2) * 1000);
+          }
+          // Subtle organic jitter at the top
+          gsap.to('.stone-wrap', {
+            keyframes: [
+              { scale: SCALE_FULL + 0.005, duration: dur * 0.22, ease: 'sine.inOut' },
+              { scale: SCALE_FULL - 0.010, duration: dur * 0.26, ease: 'sine.inOut' },
+              { scale: SCALE_FULL + 0.005, duration: dur * 0.22, ease: 'sine.inOut' },
+              { scale: SCALE_FULL,         duration: dur * 0.30, ease: 'sine.inOut' },
+            ],
+          });
+          break;
+        }
+        case 'hold-empty': {
+          // Hold at the bottom (box breathing's rest phase) — different feel.
+          // Lower pitch bowl, halo dark, no jitter, just stillness.
+          strike(bowlExhale, 0.6);
+          gsap.to('.stone-wrap', { scale: SCALE_EMPTY, duration: 0.4, ease: 'power2.out' });
+          gsap.to(halo, { opacity: 0.0, duration: 0.6, ease: 'power2.out' });
+          break;
+        }
+        case 'exhale': {
+          strike(bowlExhale, 1.6);
+          gsap.to('.stone-wrap', { scale: SCALE_EMPTY, duration: dur, ease: 'power2.inOut' });
+          gsap.to(halo, { opacity: 0.0, duration: dur, ease: 'power2.inOut' });
+          break;
+        }
+      }
+
+      setTimeout(() => { clearInterval(id); resolve(); }, dur * 1000);
     });
   }
 
@@ -762,9 +838,9 @@
     gsap.to(cycleEl, { opacity: 1, duration: 0.8, delay: 0.3 });
     for (let c = 1; c <= CYCLES; c++) {
       cycleEl.textContent = `Cycle ${c} of ${CYCLES}`;
-      await inhale();
-      await hold();
-      await exhale();
+      for (const phase of EXERCISE.phases) {
+        await runPhase(phase);
+      }
     }
     gsap.to([phaseEl, countEl, cycleEl], { opacity: 0, duration: 0.6 });
     gsap.to('.stone-wrap', { opacity: 0, duration: 1.2, ease: 'power2.inOut' });
@@ -784,6 +860,9 @@
       gsap.to(outroHint, { opacity: 1, duration: 0.8, delay: 0.2 });
     }, 600);
   }
+
+  // Show the selected exercise name on the splash screen
+  document.getElementById('splashTitle').textContent = EXERCISE.name;
 
   splash.addEventListener('click', () => {
     initAudio();
