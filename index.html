@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>breathe</title>
+  <title>ripple</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -302,6 +302,132 @@
       .exercise-grid { grid-template-columns: 1fr; max-width: 280px; }
       .exercise-card { padding: 18px 18px; }
     }
+
+    /* Custom — its own full-width row below the grid (mirrors iOS, where
+       LazyVGrid has no column-span so Custom sits on a distinct row). */
+    .custom-row { width: 100%; max-width: 500px; position: relative; }
+    .custom-card {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.045);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: 16px;
+      padding: 20px 22px;
+      color: rgba(234,240,250,0.92);
+      font-family: inherit;
+      cursor: pointer;
+      display: flex; align-items: center; gap: 14px;
+      text-align: left;
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.06) inset,
+        0 2px 8px rgba(0, 10, 30, 0.18);
+      transition: transform 0.3s ease, background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+      will-change: transform;
+    }
+    .custom-card:hover {
+      background: rgba(120, 195, 215, 0.10);
+      border-color: rgba(120, 195, 215, 0.32);
+      transform: translateY(-3px);
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.10) inset,
+        0 6px 14px rgba(0, 10, 30, 0.30);
+    }
+    .custom-card:active { transform: translateY(0); }
+    .custom-card .ico {
+      font-size: 17px; line-height: 1;
+      color: rgba(120, 195, 215, 0.85);
+      flex: 0 0 auto;
+    }
+    .custom-card .body { flex: 1 1 auto; display: flex; flex-direction: column; gap: 4px; }
+    .custom-card .ttl {
+      font-size: 20px; font-weight: 300; letter-spacing: 0.02em;
+      color: rgba(234,240,250,0.95);
+    }
+    .custom-card .sub {
+      font-size: 11px; font-weight: 500; letter-spacing: 0.20em;
+      color: rgba(234,240,250,0.55);
+      font-variant-numeric: tabular-nums; text-transform: uppercase;
+    }
+    .custom-card .chev { color: rgba(234,240,250,0.35); font-size: 13px; flex: 0 0 auto; }
+
+    /* The custom-rhythm editor — frosted plane above the selector. */
+    #editor {
+      position: fixed; inset: 0; z-index: 13;
+      display: none;
+      align-items: center; justify-content: center;
+      padding: 24px;
+      background: rgba(6, 16, 32, 0.55);
+      backdrop-filter: blur(32px) saturate(1.4);
+      -webkit-backdrop-filter: blur(32px) saturate(1.4);
+    }
+    #editor .sheet {
+      width: 100%; max-width: 420px;
+      background: rgba(255,255,255,0.045);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 22px;
+      padding: 26px 24px 22px;
+      box-shadow: 0 18px 50px rgba(0, 8, 24, 0.5);
+    }
+    #editor .sheet-title {
+      font-size: 13px; font-weight: 600;
+      letter-spacing: 0.28em; text-transform: uppercase;
+      color: rgba(234,240,250,0.55);
+      text-align: center; margin-bottom: 22px;
+    }
+    .stepper-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 2px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .stepper-row .lbl { font-size: 16px; font-weight: 400; color: rgba(234,240,250,0.92); }
+    .stepper {
+      display: flex; align-items: center; gap: 14px;
+    }
+    .stepper .val {
+      min-width: 52px; text-align: center;
+      font-size: 16px; font-weight: 500;
+      color: rgba(234,240,250,0.85);
+      font-variant-numeric: tabular-nums;
+    }
+    .stepper button {
+      width: 34px; height: 34px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.05);
+      color: rgba(234,240,250,0.9);
+      font-size: 18px; font-weight: 400; line-height: 1;
+      cursor: pointer; font-family: inherit;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+    .stepper button:hover { background: rgba(120,195,215,0.14); border-color: rgba(120,195,215,0.32); }
+    .stepper button:disabled { opacity: 0.3; cursor: default; }
+    #editor .foot-note {
+      font-size: 11px; color: rgba(234,240,250,0.45);
+      margin: 14px 2px 2px; line-height: 1.5;
+    }
+    #editor .total {
+      font-size: 12px; color: rgba(120,195,215,0.78);
+      letter-spacing: 0.04em; margin: 16px 2px 22px;
+      font-variant-numeric: tabular-nums;
+    }
+    #editor .actions { display: flex; gap: 12px; }
+    #editor .actions button {
+      flex: 1; padding: 14px;
+      border-radius: 14px; font-family: inherit;
+      font-size: 15px; font-weight: 500; cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.10);
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+    #editor .btn-cancel {
+      background: rgba(255,255,255,0.04);
+      color: rgba(234,240,250,0.75);
+    }
+    #editor .btn-cancel:hover { background: rgba(255,255,255,0.08); }
+    #editor .btn-begin {
+      background: rgba(120,195,215,0.16);
+      border-color: rgba(120,195,215,0.36);
+      color: rgba(234,240,250,0.96); font-weight: 600;
+    }
+    #editor .btn-begin:hover { background: rgba(120,195,215,0.26); }
   </style>
 </head>
 <body>
@@ -338,7 +464,7 @@
   <div id="curtain"></div>
 
   <div id="selector" style="display:none;" aria-hidden="true">
-    <h1>breathe</h1>
+    <h1>ripple</h1>
     <div class="tagline">choose your breath</div>
     <div class="exercise-grid">
       <button class="exercise-card" data-key="478">
@@ -361,6 +487,68 @@
         <div class="card-pattern">Double inhale</div>
         <div class="card-desc">Quick reset</div>
       </button>
+    </div>
+    <div class="custom-row">
+      <button class="custom-card" id="customCard" aria-haspopup="dialog">
+        <span class="ico" aria-hidden="true">&#9776;</span>
+        <span class="body">
+          <span class="ttl">Custom</span>
+          <span class="sub" id="customSub">4 · 4 · 6</span>
+        </span>
+        <span class="chev" aria-hidden="true">&#8250;</span>
+      </button>
+    </div>
+  </div>
+
+  <div id="editor" role="dialog" aria-modal="true" aria-label="Custom rhythm editor">
+    <div class="sheet">
+      <div class="sheet-title">Custom Rhythm</div>
+      <div class="stepper-row">
+        <span class="lbl">Inhale</span>
+        <span class="stepper" data-field="inhale">
+          <button type="button" class="dec" aria-label="Decrease inhale">&#8722;</button>
+          <span class="val">4s</span>
+          <button type="button" class="inc" aria-label="Increase inhale">&#43;</button>
+        </span>
+      </div>
+      <div class="stepper-row">
+        <span class="lbl">Hold</span>
+        <span class="stepper" data-field="holdFull">
+          <button type="button" class="dec" aria-label="Decrease hold">&#8722;</button>
+          <span class="val">4s</span>
+          <button type="button" class="inc" aria-label="Increase hold">&#43;</button>
+        </span>
+      </div>
+      <div class="stepper-row">
+        <span class="lbl">Exhale</span>
+        <span class="stepper" data-field="exhale">
+          <button type="button" class="dec" aria-label="Decrease exhale">&#8722;</button>
+          <span class="val">6s</span>
+          <button type="button" class="inc" aria-label="Increase exhale">&#43;</button>
+        </span>
+      </div>
+      <div class="stepper-row">
+        <span class="lbl">Rest</span>
+        <span class="stepper" data-field="holdEmpty">
+          <button type="button" class="dec" aria-label="Decrease rest">&#8722;</button>
+          <span class="val">Off</span>
+          <button type="button" class="inc" aria-label="Increase rest">&#43;</button>
+        </span>
+      </div>
+      <div class="foot-note">Set Hold or Rest to 0 to skip that phase. Range is 1&ndash;20 seconds.</div>
+      <div class="stepper-row">
+        <span class="lbl">Cycles</span>
+        <span class="stepper" data-field="cycles">
+          <button type="button" class="dec" aria-label="Decrease cycles">&#8722;</button>
+          <span class="val">4</span>
+          <button type="button" class="inc" aria-label="Increase cycles">&#43;</button>
+        </span>
+      </div>
+      <div class="total" id="editorTotal">Total: about 56 seconds (56s).</div>
+      <div class="actions">
+        <button type="button" class="btn-cancel" id="editorCancel">Cancel</button>
+        <button type="button" class="btn-begin" id="editorBegin">Begin</button>
+      </div>
     </div>
   </div>
 
@@ -448,6 +636,76 @@
     "You can come back here anytime.",
     "A little quieter.",
   ];
+
+  // ─── Custom breathing pattern ────────────────────────────────────────
+  // Ports iOS RippleCore.BreathPattern: a user-defined rhythm. Inhale and
+  // exhale must be > 0 (a breath needs both); Hold/Rest may be 0 (skipped
+  // entirely — the escape hatch for people who can't hold the preset 7s).
+  // Values are rounded; range 1–20 (holds 0–20). Default is 4-7-8 with the
+  // hold dialed back to an attainable 4 and a 6s exhale.
+  const CUSTOM = { minActive: 1, minHold: 0, max: 20 };
+  const DEFAULT_PATTERN = { inhale: 4, holdFull: 4, exhale: 6, holdEmpty: 0 };
+
+  const clampActive = v => Math.min(Math.max(Math.round(v), CUSTOM.minActive), CUSTOM.max);
+  const clampHold   = v => Math.min(Math.max(Math.round(v), CUSTOM.minHold),   CUSTOM.max);
+  function makePattern(p) {
+    return {
+      inhale:    clampActive(Number(p?.inhale)),
+      holdFull:  clampHold(Number(p?.holdFull)),
+      exhale:    clampActive(Number(p?.exhale)),
+      holdEmpty: clampHold(Number(p?.holdEmpty)),
+    };
+  }
+  // Zero-duration holds are omitted so the runner never sleeps 0s or shows
+  // an empty "Hold 0". Labels match iOS BreathPattern.phases exactly.
+  function patternPhases(p) {
+    const out = [{ type: 'inhale', duration: p.inhale, label: 'Breathe in' }];
+    if (p.holdFull > 0)  out.push({ type: 'hold-full',  duration: p.holdFull,  label: 'Hold' });
+    out.push({ type: 'exhale', duration: p.exhale, label: 'Breathe out' });
+    if (p.holdEmpty > 0) out.push({ type: 'hold-empty', duration: p.holdEmpty, label: 'Rest' });
+    return out;
+  }
+  const patternLine = p => patternPhases(p).map(ph => ph.duration).join(' · ');
+  const patternCycleDuration = p => patternPhases(p).reduce((a, ph) => a + ph.duration, 0);
+
+  // Persistence — the web equivalent of iOS AppState/Preferences, so a
+  // returning user sees their own numbers on the Custom card.
+  const LS_PATTERN = 'ripple.customPattern', LS_CYCLES = 'ripple.customCycles';
+  function loadCustom() {
+    let pattern = { ...DEFAULT_PATTERN }, cycles = 4;
+    try {
+      const rp = JSON.parse(localStorage.getItem(LS_PATTERN) || 'null');
+      if (rp && typeof rp === 'object') pattern = makePattern(rp);
+      const rc = parseInt(localStorage.getItem(LS_CYCLES), 10);
+      if (Number.isFinite(rc) && rc >= 1 && rc <= 10) cycles = rc;
+    } catch (e) { /* private mode / disabled storage → defaults */ }
+    return { pattern, cycles };
+  }
+  function saveCustom(pattern, cycles) {
+    try {
+      localStorage.setItem(LS_PATTERN, JSON.stringify(pattern));
+      localStorage.setItem(LS_CYCLES, String(cycles));
+    } catch (e) { /* non-fatal — session still runs this launch */ }
+  }
+  let customState = loadCustom();
+
+  // Build an EXERCISE-shaped config from a custom pattern so the existing
+  // phase runner / session machinery is agnostic to preset vs custom
+  // (mirrors iOS SessionConfig).
+  function configureCustom(pattern, cycles) {
+    const phases = patternPhases(pattern);
+    EXERCISE = { name: 'Custom', defaultCycles: cycles, phases };
+    let n = parseInt(cycles, 10);
+    if (!Number.isFinite(n) || n < 1) n = 4;
+    if (n > 10) n = 10;
+    CYCLES = n;
+    SESSION_SECONDS = phases.reduce((a, p) => a + p.duration, 0) * CYCLES;
+  }
+
+  function refreshCustomCard() {
+    const sub = document.getElementById('customSub');
+    if (sub) sub.textContent = patternLine(customState.pattern);
+  }
 
   // Bokeh — underwater drifting light particles.
   const bokeh = document.getElementById('bokeh');
@@ -547,55 +805,117 @@
     if (!adapter) throw new Error('No WebGPU adapter');
     const device = await adapter.requestDevice();
     const context = canvas.getContext('webgpu');
+    // Preferred format avoids an extra blit on macOS/Android; the in-shader
+    // triangular dither (not a 16-bit target) is what kills the dark-teal
+    // banding here — same parity outcome as iOS's rgba16Float without the
+    // canvas-format perf cost.
     const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
     context.configure({ device, format: presentationFormat, alphaMode: 'opaque' });
 
-    // Sim resolution — match canvas backing pixel size at 1x DPR for perf.
-    // (Visual softness from CSS blurring hides the half-res aesthetic on retina.)
+    // Sim runs at 0.6× backing res (matches iOS WaterRenderer). r32Float is
+    // kept (the arbitrated decision: r16 quantises the slow decay tail into a
+    // permanent shimmer — the calm settle IS the product).
+    const SIM_SCALE = 0.6;
     let simW = 0, simH = 0;
-    let currentTex, previousTex, nextTex;
-    let computeBindGroups, renderBindGroups;
+    let texA, texB, texC;            // three ping-pong height fields
+    let seedGroups, waveGroups, renderGroups;
+    let simStep = 0;
 
     const MAX_DROPS = 8;
-    const SIM_UNIFORM_SIZE = 16 + MAX_DROPS * 16;  // header + drops
+    // SimParams: 6×f32 + u32 + pad = 32B header, then array<Drop,8> @ off 32.
+    const SIM_UNIFORM_SIZE = 32 + MAX_DROPS * 16;
+    const RENDER_UNIFORM_SIZE = 32;  // vec2 + 4×f32 + pad → 16-byte aligned
     const simUniformBuffer = device.createBuffer({
       size: SIM_UNIFORM_SIZE,
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
     });
     const renderUniformBuffer = device.createBuffer({
-      size: 16,
+      size: RENDER_UNIFORM_SIZE,
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
     });
 
-    // Pending drops to inject this frame
     let pendingDrops = [];
     triggerPulse = (x, y, intensity = 1.0) => {
-      // Convert screen px → sim px
       const rect = canvas.getBoundingClientRect();
       const sx = (x / rect.width) * simW;
-      const sy = (y / rect.height) * simH;
+      // Flip Y: screen origin is top-left; the field's UV space is Y-up.
+      const sy = (1.0 - y / rect.height) * simH;
       pendingDrops.push({ x: sx, y: sy, intensity });
+      // A pulse resumes the loop if the pool had settled to stillness.
+      if (!running) { running = true; lastTime = performance.now(); requestAnimationFrame(frame); }
+      lastActivity = performance.now();
     };
 
-    // ── Compute shader (wave simulation step) ──────────────────────────
-    const computeWGSL = /* wgsl */`
-      struct Drop {
-        pos: vec2<f32>,
-        intensity: f32,
-        _pad: f32,
-      };
+    // ── Drop seeding (compute) ─────────────────────────────────────────
+    // A stone makes a displacement released from rest: add the SAME
+    // difference-of-Gaussians crater (negative core + raised rim) to BOTH
+    // current and previous so the implied initial velocity is zero. Each
+    // thread touches only its own texel of each texture → read_write is
+    // hazard-free (r32float is the WGSL read_write storage format).
+    const seedWGSL = /* wgsl */`
+      struct Drop { pos: vec2<f32>, intensity: f32, _pad: f32, };
       struct SimParams {
-        waveSpeed: f32,
-        damping: f32,
-        dropCount: u32,
-        _pad: f32,
+        waveSpeed: f32, damping: f32, viscosity: f32, spongeBand: f32,
+        spongeEdge: f32, dropRadius: f32, dropCount: u32, _pad: f32,
         drops: array<Drop, ${MAX_DROPS}>,
       };
+      @group(0) @binding(0) var curTex:  texture_storage_2d<r32float, read_write>;
+      @group(0) @binding(1) var prevTex: texture_storage_2d<r32float, read_write>;
+      @group(0) @binding(2) var<uniform> params: SimParams;
 
+      @compute @workgroup_size(8, 8)
+      fn main(@builtin(global_invocation_id) gid: vec3<u32>) {
+        let coord = vec2<i32>(gid.xy);
+        let size  = vec2<i32>(textureDimensions(curTex));
+        if (coord.x >= size.x || coord.y >= size.y) { return; }
+
+        var disp = 0.0;
+        let r = max(params.dropRadius, 4.0);
+        for (var i = 0u; i < params.dropCount; i = i + 1u) {
+          let d = params.drops[i];
+          let dist = distance(vec2<f32>(coord), d.pos);
+          if (dist < r * 1.6) {
+            let x = dist / r;
+            let core = exp(-x * x * 2.2);                          // depression
+            let rim  = exp(-(x - 1.0) * (x - 1.0) * 3.0) * 0.55;   // raised ring
+            disp = disp + d.intensity * (rim - core);
+          }
+        }
+        if (disp == 0.0) { return; }
+
+        let c = textureLoad(curTex,  coord).r + disp;
+        let p = textureLoad(prevTex, coord).r + disp;  // same add → zero velocity
+        textureStore(curTex,  coord, vec4<f32>(c, 0.0, 0.0, 0.0));
+        textureStore(prevTex, coord, vec4<f32>(p, 0.0, 0.0, 0.0));
+      }
+    `;
+
+    // ── Wave step (compute) ────────────────────────────────────────────
+    // Damped leapfrog + frequency-dependent viscosity μ·∇²(c−p) (capillary
+    // detail dies fast, the long swell persists — real water, not a rubber
+    // sheet) + quadratic sponge edge (ripples fade at the rim instead of
+    // bouncing forever) + NaN/clamp containment.
+    const waveWGSL = /* wgsl */`
+      struct Drop { pos: vec2<f32>, intensity: f32, _pad: f32, };
+      struct SimParams {
+        waveSpeed: f32, damping: f32, viscosity: f32, spongeBand: f32,
+        spongeEdge: f32, dropRadius: f32, dropCount: u32, _pad: f32,
+        drops: array<Drop, ${MAX_DROPS}>,
+      };
       @group(0) @binding(0) var currentTex:  texture_storage_2d<r32float, read>;
       @group(0) @binding(1) var previousTex: texture_storage_2d<r32float, read>;
       @group(0) @binding(2) var nextTex:     texture_storage_2d<r32float, write>;
       @group(0) @binding(3) var<uniform> params: SimParams;
+
+      fn lap5(t: texture_storage_2d<r32float, read>, c: vec2<i32>, size: vec2<i32>) -> f32 {
+        let L = clamp(c + vec2<i32>(-1, 0), vec2<i32>(0), size - vec2<i32>(1));
+        let R = clamp(c + vec2<i32>( 1, 0), vec2<i32>(0), size - vec2<i32>(1));
+        let T = clamp(c + vec2<i32>( 0,-1), vec2<i32>(0), size - vec2<i32>(1));
+        let B = clamp(c + vec2<i32>( 0, 1), vec2<i32>(0), size - vec2<i32>(1));
+        let v = textureLoad(t, c).r;
+        return textureLoad(t, L).r + textureLoad(t, R).r
+             + textureLoad(t, T).r + textureLoad(t, B).r - 4.0 * v;
+      }
 
       @compute @workgroup_size(8, 8)
       fn main(@builtin(global_invocation_id) gid: vec3<u32>) {
@@ -603,38 +923,37 @@
         let size  = vec2<i32>(textureDimensions(currentTex));
         if (coord.x >= size.x || coord.y >= size.y) { return; }
 
-        // Reflective bounds — clamp neighbor sampling so waves bounce off edges
-        let left   = clamp(coord + vec2<i32>(-1,  0), vec2<i32>(0), size - vec2<i32>(1));
-        let right  = clamp(coord + vec2<i32>( 1,  0), vec2<i32>(0), size - vec2<i32>(1));
-        let top    = clamp(coord + vec2<i32>( 0, -1), vec2<i32>(0), size - vec2<i32>(1));
-        let bottom = clamp(coord + vec2<i32>( 0,  1), vec2<i32>(0), size - vec2<i32>(1));
+        let c = textureLoad(currentTex,  coord).r;
+        let p = textureLoad(previousTex, coord).r;
+        let lapC = lap5(currentTex,  coord, size);
+        let lapP = lap5(previousTex, coord, size);
 
-        let cL = textureLoad(currentTex,  left).r;
-        let cR = textureLoad(currentTex,  right).r;
-        let cT = textureLoad(currentTex,  top).r;
-        let cB = textureLoad(currentTex,  bottom).r;
-        let c  = textureLoad(currentTex,  coord).r;
-        let p  = textureLoad(previousTex, coord).r;
-
-        var next: f32 = c * 2.0 - p + params.waveSpeed * (cL + cR + cT + cB - 4.0 * c);
+        var next = c * 2.0 - p + params.waveSpeed * lapC
+                 + params.viscosity * (lapC - lapP);
         next = next * params.damping;
 
-        // Inject any pending drops as soft Gaussian-ish bumps
-        for (var i = 0u; i < params.dropCount; i = i + 1u) {
-          let d = params.drops[i];
-          let dist = distance(vec2<f32>(coord), d.pos);
-          let r = 14.0;
-          if (dist < r) {
-            let falloff = 1.0 - smoothstep(0.0, r, dist);
-            next = next + d.intensity * falloff * falloff;
-          }
+        // Sponge: quadratic ramp from 1.0 (interior) to spongeEdge (rim).
+        let e = min(min(coord.x, size.x - 1 - coord.x),
+                    min(coord.y, size.y - 1 - coord.y));
+        let st = clamp(f32(e) / max(params.spongeBand, 1.0), 0.0, 1.0);
+        next = next * mix(params.spongeEdge, 1.0, st * st);
+
+        // Containment: a runaway NaN/Inf must not poison the field. WGSL has
+        // no isfinite; (x - x == 0) is the exact IEEE isfinite identity
+        // (finite→0; Inf→Inf-Inf=NaN; NaN→NaN; NaN==0 is false) — the
+        // faithful equivalent of the MSL isfinite(next) ? clamp(-4,4) : 0,
+        // with no f32-max literal to mis-round.
+        if (next - next == 0.0) {
+          next = clamp(next, -4.0, 4.0);
+        } else {
+          next = 0.0;
         }
 
         textureStore(nextTex, coord, vec4<f32>(next, 0.0, 0.0, 0.0));
       }
     `;
 
-    // ── Render shader (height → lit water surface) ─────────────────────
+    // ── Render shader (height → photo-real lit water) ──────────────────
     const renderWGSL = /* wgsl */`
       struct VOut {
         @builtin(position) pos: vec4<f32>,
@@ -643,15 +962,47 @@
       struct RenderParams {
         resolution: vec2<f32>,
         time: f32,
-        _pad: f32,
+        normalScale: f32,
+        aspect: f32,
+        _pad0: f32,
+        _pad1: f32,
+        _pad2: f32,
       };
 
       @group(0) @binding(0) var heightTex: texture_storage_2d<r32float, read>;
       @group(0) @binding(1) var<uniform> rp: RenderParams;
 
+      // Manual bilinear — r32float isn't sampler-filterable and the sim runs
+      // at 0.6× backing res; point-sampling magnified to retina staircases
+      // the speculars.
+      fn bilinearHeight(texPos: vec2<f32>, size: vec2<i32>) -> f32 {
+        let pp = texPos - 0.5;
+        let f  = fract(pp);
+        let i  = vec2<i32>(floor(pp));
+        let i00 = clamp(i + vec2<i32>(0, 0), vec2<i32>(0), size - vec2<i32>(1));
+        let i10 = clamp(i + vec2<i32>(1, 0), vec2<i32>(0), size - vec2<i32>(1));
+        let i01 = clamp(i + vec2<i32>(0, 1), vec2<i32>(0), size - vec2<i32>(1));
+        let i11 = clamp(i + vec2<i32>(1, 1), vec2<i32>(0), size - vec2<i32>(1));
+        let h00 = textureLoad(heightTex, i00).r;
+        let h10 = textureLoad(heightTex, i10).r;
+        let h01 = textureLoad(heightTex, i01).r;
+        let h11 = textureLoad(heightTex, i11).r;
+        return mix(mix(h00, h10, f.x), mix(h01, h11, f.x), f.y);
+      }
+
+      // Cheap procedural sky the water reflects — cool zenith → warm horizon.
+      fn skyColor(dir: vec3<f32>) -> vec3<f32> {
+        let t = clamp(dir.y * 0.5 + 0.5, 0.0, 1.0);
+        let horizon = vec3<f32>(0.16, 0.26, 0.40);
+        let zenith  = vec3<f32>(0.02, 0.06, 0.14);
+        let sky = mix(horizon, zenith, t);
+        let sun = normalize(vec3<f32>(0.35, 0.55, 0.9));
+        let s = pow(clamp(dot(dir, sun), 0.0, 1.0), 64.0);
+        return sky + vec3<f32>(0.9, 0.85, 0.7) * s * 0.6;
+      }
+
       @vertex
       fn vs(@builtin(vertex_index) idx: u32) -> VOut {
-        // Full-screen triangle technique
         var positions = array<vec2<f32>, 3>(
           vec2<f32>(-1.0, -1.0),
           vec2<f32>( 3.0, -1.0),
@@ -670,58 +1021,96 @@
 
       @fragment
       fn fs(in: VOut) -> @location(0) vec4<f32> {
-        let size  = vec2<i32>(textureDimensions(heightTex));
-        let sizeF = vec2<f32>(size);
-        let coord = vec2<i32>(in.uv * sizeF);
+        let size   = vec2<i32>(textureDimensions(heightTex));
+        let sizeF  = vec2<f32>(size);
+        let texPos = in.uv * sizeF;
 
-        // Sample center + neighbors for normal computation
-        let L = clamp(coord + vec2<i32>(-1,  0), vec2<i32>(0), size - vec2<i32>(1));
-        let R = clamp(coord + vec2<i32>( 1,  0), vec2<i32>(0), size - vec2<i32>(1));
-        let T = clamp(coord + vec2<i32>( 0, -1), vec2<i32>(0), size - vec2<i32>(1));
-        let B = clamp(coord + vec2<i32>( 0,  1), vec2<i32>(0), size - vec2<i32>(1));
-        let hL = textureLoad(heightTex, L).r;
-        let hR = textureLoad(heightTex, R).r;
-        let hT = textureLoad(heightTex, T).r;
-        let hB = textureLoad(heightTex, B).r;
+        let texel = 1.0;
+        let hC = bilinearHeight(texPos, size);
+        let hL = bilinearHeight(texPos + vec2<f32>(-texel, 0.0), size);
+        let hR = bilinearHeight(texPos + vec2<f32>( texel, 0.0), size);
+        let hT = bilinearHeight(texPos + vec2<f32>(0.0, -texel), size);
+        let hB = bilinearHeight(texPos + vec2<f32>(0.0,  texel), size);
 
-        // Surface normal from height gradient
-        let n = normalize(vec3<f32>((hL - hR) * 4.0, (hT - hB) * 4.0, 1.0));
+        // Resolution-invariant slope (normalScale set from sim dims on host).
+        let n = normalize(vec3<f32>((hL - hR) * rp.normalScale,
+                                    (hT - hB) * rp.normalScale,
+                                    1.0));
+        let viewDir = vec3<f32>(0.0, 0.0, 1.0);
 
-        // Base water — deep teal with a soft vignette around center
-        let center = vec2<f32>(0.5, 0.5);
-        let d = distance(in.uv, center);
-        let vignette = 1.0 - smoothstep(0.25, 1.05, d);
+        // Aspect-correct radial vignette → a round pool on a tall phone.
+        var cuv = in.uv - 0.5;
+        cuv.x = cuv.x * rp.aspect;
+        let dd = length(cuv);
+        let vignette = 1.0 - smoothstep(0.32, 1.15, dd);
 
         let deep    = vec3<f32>(0.012, 0.045, 0.110);
         let shallow = vec3<f32>(0.055, 0.155, 0.260);
-        var baseColor = mix(deep, shallow, vignette);
+        var body = mix(deep, shallow, vignette);
 
-        // Diffuse — light angled from upper-left
+        // Depth tint — troughs darker, crests lighter (fake thickness/SSS).
+        body = body * (1.0 + clamp(hC, -0.6, 0.6) * 0.45);
+
+        // Hemispheric ambient so shadowed faces don't crush to black on OLED.
+        let ambient = mix(vec3<f32>(0.02, 0.05, 0.09),
+                          vec3<f32>(0.08, 0.14, 0.22),
+                          n.z * 0.5 + 0.5) * 0.5;
+
         let lightDir = normalize(vec3<f32>(0.35, 0.55, 0.9));
         let diff = max(dot(n, lightDir), 0.0);
 
-        // Specular crest highlight — narrow & bright on wave peaks
-        let viewDir = vec3<f32>(0.0, 0.0, 1.0);
+        // Schlick Fresnel mixing the body with a reflected sky — the single
+        // biggest "this is water, not jelly" cue.
+        let F0 = 0.02;
+        let fres = F0 + (1.0 - F0) * pow(1.0 - max(dot(n, viewDir), 0.0), 5.0);
+        let refl = skyColor(reflect(-viewDir, n));
+
         let halfway = normalize(lightDir + viewDir);
-        let spec = pow(max(dot(n, halfway), 0.0), 48.0);
+        let spec = pow(max(dot(n, halfway), 0.0), 80.0);
 
-        // Subtle fresnel-ish rim
-        let fres = pow(1.0 - max(n.z, 0.0), 3.0);
+        var color = body + ambient;
+        color = color + vec3<f32>(0.22, 0.42, 0.55) * diff * 0.20;
+        color = mix(color, refl, fres * 0.85);
+        color = color + vec3<f32>(1.05, 1.15, 1.25) * spec * 1.4;
 
-        var color = baseColor;
-        color = color + vec3<f32>(0.22, 0.42, 0.55) * diff * 0.22;
-        color = color + vec3<f32>(0.75, 0.90, 1.00) * spec * 1.1;
-        color = color + vec3<f32>(0.15, 0.30, 0.45) * fres * 0.35;
+        // Triangular-hash dither — kills banding in the dark teal gradient
+        // on 8-bit / OLED. ~1 LSB.
+        let dither = fract(sin(dot(in.pos.xy, vec2<f32>(12.9898, 78.233)))
+                           * 43758.5453);
+        color = color + (dither - 0.5) / 255.0;
 
         return vec4<f32>(color, 1.0);
       }
     `;
 
-    const computeModule = device.createShaderModule({ code: computeWGSL });
+    const seedModule   = device.createShaderModule({ code: seedWGSL });
+    const waveModule    = device.createShaderModule({ code: waveWGSL });
     const renderModule  = device.createShaderModule({ code: renderWGSL });
 
+    // Loud, line-level WGSL compile diagnostics (the user-chosen browser
+    // verification gate; fast + loud per the engineering contract).
+    for (const [name, mod] of [['seed', seedModule], ['wave', waveModule], ['render', renderModule]]) {
+      mod.getCompilationInfo?.().then(info => {
+        for (const m of info.messages) {
+          if (m.type === 'error') console.error(`WGSL ${name} ${m.lineNum}:${m.linePos} ${m.message}`);
+        }
+      });
+    }
+
     // ── Pipelines & layouts ────────────────────────────────────────────
-    const computeBindGroupLayout = device.createBindGroupLayout({
+    const seedLayout = device.createBindGroupLayout({
+      entries: [
+        { binding: 0, visibility: GPUShaderStage.COMPUTE, storageTexture: { access: 'read-write', format: 'r32float' } },
+        { binding: 1, visibility: GPUShaderStage.COMPUTE, storageTexture: { access: 'read-write', format: 'r32float' } },
+        { binding: 2, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'uniform' } },
+      ],
+    });
+    const seedPipeline = device.createComputePipeline({
+      layout: device.createPipelineLayout({ bindGroupLayouts: [seedLayout] }),
+      compute: { module: seedModule, entryPoint: 'main' },
+    });
+
+    const waveLayout = device.createBindGroupLayout({
       entries: [
         { binding: 0, visibility: GPUShaderStage.COMPUTE, storageTexture: { access: 'read-only',  format: 'r32float' } },
         { binding: 1, visibility: GPUShaderStage.COMPUTE, storageTexture: { access: 'read-only',  format: 'r32float' } },
@@ -729,9 +1118,9 @@
         { binding: 3, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'uniform' } },
       ],
     });
-    const computePipeline = device.createComputePipeline({
-      layout: device.createPipelineLayout({ bindGroupLayouts: [computeBindGroupLayout] }),
-      compute: { module: computeModule, entryPoint: 'main' },
+    const wavePipeline = device.createComputePipeline({
+      layout: device.createPipelineLayout({ bindGroupLayouts: [waveLayout] }),
+      compute: { module: waveModule, entryPoint: 'main' },
     });
 
     const renderBindGroupLayout = device.createBindGroupLayout({
@@ -747,111 +1136,180 @@
       primitive: { topology: 'triangle-list' },
     });
 
-    // ── Texture allocation (re-runs on resize) ─────────────────────────
     function makeTex() {
       return device.createTexture({
         size: [simW, simH],
         format: 'r32float',
+        // STORAGE_BINDING textures are zero-initialised by the WebGPU spec on
+        // creation → no clearTex kernel needed (the iOS one only exists
+        // because Metal .private memory is undefined); the pool opens as
+        // glass and resizes don't propagate garbage.
         usage: GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.COPY_SRC | GPUTextureUsage.COPY_DST,
       });
     }
+
     function makeBindGroups() {
-      // Three rotation states of (current, previous, next)
-      const states = [
-        { current: currentTex,  previous: previousTex, next: nextTex },
-        { current: nextTex,     previous: currentTex,  next: previousTex },
-        { current: previousTex, previous: nextTex,     next: currentTex },
-      ];
-      computeBindGroups = states.map(s => device.createBindGroup({
-        layout: computeBindGroupLayout,
-        entries: [
-          { binding: 0, resource: s.current.createView() },
-          { binding: 1, resource: s.previous.createView() },
-          { binding: 2, resource: s.next.createView() },
-          { binding: 3, resource: { buffer: simUniformBuffer } },
-        ],
-      }));
-      renderBindGroups = states.map(s => device.createBindGroup({
-        layout: renderBindGroupLayout,
-        entries: [
-          // Render reads the freshly-written "next" texture (which is current
-          // post-rotation in our cycle).
-          { binding: 0, resource: s.next.createView() },
-          { binding: 1, resource: { buffer: renderUniformBuffer } },
-        ],
-      }));
+      const tex = [texA, texB, texC];
+      seedGroups = []; waveGroups = []; renderGroups = [];
+      for (let s = 0; s < 3; s++) {
+        const cur  = tex[s];
+        const prev = tex[(s + 2) % 3];
+        const nxt  = tex[(s + 1) % 3];
+        seedGroups.push(device.createBindGroup({
+          layout: seedLayout,
+          entries: [
+            { binding: 0, resource: cur.createView() },
+            { binding: 1, resource: prev.createView() },
+            { binding: 2, resource: { buffer: simUniformBuffer } },
+          ],
+        }));
+        waveGroups.push(device.createBindGroup({
+          layout: waveLayout,
+          entries: [
+            { binding: 0, resource: cur.createView() },
+            { binding: 1, resource: prev.createView() },
+            { binding: 2, resource: nxt.createView() },
+            { binding: 3, resource: { buffer: simUniformBuffer } },
+          ],
+        }));
+        // After N steps the head of the leapfrog is tex[simStep % 3].
+        renderGroups.push(device.createBindGroup({
+          layout: renderBindGroupLayout,
+          entries: [
+            { binding: 0, resource: tex[s].createView() },
+            { binding: 1, resource: { buffer: renderUniformBuffer } },
+          ],
+        }));
+      }
     }
 
     function resize() {
-      // CSS pixels for display; we keep backing res modest for perf.
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const targetW = Math.max(64, Math.floor(window.innerWidth  * dpr * 0.6));
-      const targetH = Math.max(64, Math.floor(window.innerHeight * dpr * 0.6));
+      const targetW = Math.max(64, Math.floor(window.innerWidth  * dpr * SIM_SCALE));
+      const targetH = Math.max(64, Math.floor(window.innerHeight * dpr * SIM_SCALE));
       canvas.width  = targetW;
       canvas.height = targetH;
       simW = targetW;
       simH = targetH;
 
-      // Free old textures
-      if (currentTex)  currentTex.destroy();
-      if (previousTex) previousTex.destroy();
-      if (nextTex)     nextTex.destroy();
-      currentTex  = makeTex();
-      previousTex = makeTex();
-      nextTex     = makeTex();
+      if (texA) texA.destroy();
+      if (texB) texB.destroy();
+      if (texC) texC.destroy();
+      texA = makeTex();
+      texB = makeTex();
+      texC = makeTex();
+      simStep = 0;
+      accumulator = 0;
+      lastTime = performance.now();
       makeBindGroups();
     }
 
+    // ── Fixed-timestep render loop ─────────────────────────────────────
+    // Sim advances at a constant 60 Hz regardless of display refresh, so the
+    // tuning is device-independent (coupling to rAF ran 2× on 120 Hz). The
+    // pool quiesces to a paused loop once still; a pulse resumes it.
+    const SIM_HZ = 60;
+    const SIM_DT = 1 / SIM_HZ;
+    const MAX_STEPS_PER_FRAME = 4;
+    const SETTLE_MS = 30000;
+    let accumulator = 0;
+    let lastTime = performance.now();
+    const startTime = performance.now();
+    let lastActivity = performance.now();
+    let running = true;
+
+    // Per fixed 60 Hz step. damping is a tiny global sink; the viscosity
+    // term does the real frequency-dependent decay.
+    const WAVE_SPEED = 0.42;
+    const DAMPING    = 0.9992;
+    const VISCOSITY  = 0.018;
+    const SPONGE_EDGE = 0.92;
+
     window.addEventListener('resize', resize);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && !running) {
+        running = true; lastTime = performance.now(); requestAnimationFrame(frame);
+      }
+    });
     resize();
 
-    // ── Render loop ────────────────────────────────────────────────────
-    let frameIdx = 0;
-    let lastTime = performance.now();
-
     function frame(now) {
-      const dt = (now - lastTime) / 1000;
-      lastTime = now;
+      // Never burn battery animating water nobody is looking at.
+      if (document.hidden) { running = false; return; }
 
-      // Write uniforms — wave speed, damping, pending drops
+      let dt = (now - lastTime) / 1000;
+      lastTime = now;
+      if (dt > 0.25) dt = 0.25;          // clamp after a hitch
+      accumulator += dt;
+
+      const drops = pendingDrops;
+      pendingDrops = [];
+      if (drops.length) lastActivity = now;
+
+      let steps = Math.floor(accumulator / SIM_DT);
+      accumulator -= steps * SIM_DT;
+      if (drops.length) steps = Math.max(steps, 1);   // always launch a ripple
+      steps = Math.min(steps, MAX_STEPS_PER_FRAME);
+
+      // Quiescence: pause the loop once the pool has had time to settle.
+      if (!drops.length && now - lastActivity > SETTLE_MS) { running = false; return; }
+
+      const minWH = Math.min(simW, simH);
+      const dropRadius = Math.max(6.0, 0.035 * minWH);
+      const spongeBand = Math.max(8.0, 0.06 * minWH);
+
+      // Sim uniforms (header 32B, then up to 8 drops × 16B).
       const uniBuf = new ArrayBuffer(SIM_UNIFORM_SIZE);
-      const u32 = new Uint32Array(uniBuf);
       const f32 = new Float32Array(uniBuf);
-      f32[0] = 0.42;            // waveSpeed (CFL-stable for dt=1)
-      f32[1] = 0.9965;          // damping per step
-      u32[2] = Math.min(pendingDrops.length, MAX_DROPS);
-      // drops start at offset 16 bytes
-      for (let i = 0; i < Math.min(pendingDrops.length, MAX_DROPS); i++) {
-        const base = 4 + i * 4;  // each Drop = vec2 + f32 + pad = 16 bytes = 4 f32 slots
-        f32[base + 0] = pendingDrops[i].x;
-        f32[base + 1] = pendingDrops[i].y;
-        f32[base + 2] = pendingDrops[i].intensity;
+      const u32 = new Uint32Array(uniBuf);
+      f32[0] = WAVE_SPEED;
+      f32[1] = DAMPING;
+      f32[2] = VISCOSITY;
+      f32[3] = spongeBand;
+      f32[4] = SPONGE_EDGE;
+      f32[5] = dropRadius;
+      u32[6] = Math.min(drops.length, MAX_DROPS);
+      f32[7] = 0;
+      for (let i = 0; i < Math.min(drops.length, MAX_DROPS); i++) {
+        const base = 8 + i * 4;        // drops array starts at byte 32
+        f32[base + 0] = drops[i].x;
+        f32[base + 1] = drops[i].y;
+        f32[base + 2] = drops[i].intensity;
         f32[base + 3] = 0;
       }
       device.queue.writeBuffer(simUniformBuffer, 0, uniBuf);
-      pendingDrops = [];
 
-      // Render uniforms
-      const rUni = new Float32Array(4);
+      const rUni = new Float32Array(RENDER_UNIFORM_SIZE / 4);
       rUni[0] = simW;
       rUni[1] = simH;
-      rUni[2] = now / 1000;
-      rUni[3] = 0;
+      rUni[2] = (now - startTime) / 1000;
+      rUni[3] = 4.0 * simW / 700.0;     // resolution-invariant slope
+      rUni[4] = Math.max(simW, 1) / Math.max(simH, 1);
       device.queue.writeBuffer(renderUniformBuffer, 0, rUni);
 
-      const stateIdx = frameIdx % 3;
       const encoder = device.createCommandEncoder();
 
-      // Compute pass — one wave step
-      {
+      // Seed once, released-from-rest, into the (current, previous) pair the
+      // first wave step will read.
+      if (drops.length) {
         const pass = encoder.beginComputePass();
-        pass.setPipeline(computePipeline);
-        pass.setBindGroup(0, computeBindGroups[stateIdx]);
+        pass.setPipeline(seedPipeline);
+        pass.setBindGroup(0, seedGroups[simStep % 3]);
         pass.dispatchWorkgroups(Math.ceil(simW / 8), Math.ceil(simH / 8));
         pass.end();
       }
 
-      // Render pass — full-screen quad reading the just-written next tex
+      // Exactly `steps` wave steps, rotating the leapfrog each step.
+      for (let i = 0; i < steps; i++) {
+        const pass = encoder.beginComputePass();
+        pass.setPipeline(wavePipeline);
+        pass.setBindGroup(0, waveGroups[simStep % 3]);
+        pass.dispatchWorkgroups(Math.ceil(simW / 8), Math.ceil(simH / 8));
+        pass.end();
+        simStep++;
+      }
+
+      // Render the head of the leapfrog (tex[simStep % 3]).
       {
         const view = context.getCurrentTexture().createView();
         const pass = encoder.beginRenderPass({
@@ -863,13 +1321,12 @@
           }],
         });
         pass.setPipeline(renderPipeline);
-        pass.setBindGroup(0, renderBindGroups[stateIdx]);
+        pass.setBindGroup(0, renderGroups[simStep % 3]);
         pass.draw(3);
         pass.end();
       }
 
       device.queue.submit([encoder.finish()]);
-      frameIdx++;
       requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
@@ -1105,6 +1562,85 @@
       }, { once: true });
     });
   }
+
+  // ─── Custom-rhythm editor ────────────────────────────────────────────
+  // The web analogue of iOS CustomPatternSheet. Bound once (the overlay
+  // controls are persistent — unlike the once:true exercise cards, the
+  // Custom card must keep working after a session returns to the picker).
+  function setupEditor() {
+    const editor   = document.getElementById('editor');
+    const totalEl  = document.getElementById('editorTotal');
+    const FIELD = {
+      inhale:    { min: CUSTOM.minActive, max: CUSTOM.max },
+      holdFull:  { min: CUSTOM.minHold,   max: CUSTOM.max },
+      exhale:    { min: CUSTOM.minActive, max: CUSTOM.max },
+      holdEmpty: { min: CUSTOM.minHold,   max: CUSTOM.max },
+      cycles:    { min: 1,                max: 10 },
+    };
+    let draft, draftCycles;
+
+    const valStr = (f, v) =>
+      f === 'cycles' ? String(v)
+      : ((f === 'holdFull' || f === 'holdEmpty') && v === 0) ? 'Off'
+      : v + 's';
+    const timeString = s => {
+      const m = Math.floor(s / 60), sec = s % 60;
+      return m > 0 ? `${m}m ${sec}s` : `${sec}s`;
+    };
+    function syncUI() {
+      editor.querySelectorAll('.stepper').forEach(st => {
+        const f = st.getAttribute('data-field');
+        const v = f === 'cycles' ? draftCycles : draft[f];
+        st.querySelector('.val').textContent = valStr(f, v);
+        st.querySelector('.dec').disabled = v <= FIELD[f].min;
+        st.querySelector('.inc').disabled = v >= FIELD[f].max;
+      });
+      const secs = Math.round(patternCycleDuration(draft)) * draftCycles;
+      totalEl.textContent = `Total: about ${secs} seconds (${timeString(secs)}).`;
+    }
+    function open() {
+      draft = { ...customState.pattern };
+      draftCycles = customState.cycles;
+      syncUI();
+      editor.style.display = 'flex';
+    }
+    function close() { editor.style.display = 'none'; }
+
+    document.getElementById('customCard').addEventListener('click', open);
+    document.getElementById('editorCancel').addEventListener('click', close);
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && editor.style.display === 'flex') close();
+    });
+    editor.querySelectorAll('.stepper').forEach(st => {
+      const f = st.getAttribute('data-field');
+      const step = d => {
+        if (f === 'cycles') {
+          draftCycles = Math.min(FIELD.cycles.max, Math.max(FIELD.cycles.min, draftCycles + d));
+        } else {
+          draft[f] = Math.min(FIELD[f].max, Math.max(FIELD[f].min, draft[f] + d));
+        }
+        syncUI();
+      };
+      st.querySelector('.dec').addEventListener('click', () => step(-1));
+      st.querySelector('.inc').addEventListener('click', () => step(+1));
+    });
+    document.getElementById('editorBegin').addEventListener('click', () => {
+      const pattern = makePattern(draft);
+      customState = { pattern, cycles: draftCycles };
+      saveCustom(pattern, draftCycles);
+      refreshCustomCard();
+      close();
+      configureCustom(pattern, draftCycles);
+      initAudio();
+      gsap.to(selector, { opacity: 0, duration: 0.8, onComplete: () => {
+        selector.style.display = 'none';
+        selector.setAttribute('aria-hidden', 'true');
+      }});
+      setTimeout(runSession, 900);
+    });
+  }
+  setupEditor();
+  refreshCustomCard();
   </script>
 </body>
 </html>
